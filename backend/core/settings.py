@@ -13,7 +13,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # --- SÉCURITÉ ---
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-changez-cette-cle-en-production')
 DEBUG = os.getenv('DJANGO_DEBUG', 'True') == 'True'
-ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = ['encheres-live.onrender.com', 'localhost', '127.0.0.1', '*']
 
 # --- APPLICATIONS ---
 INSTALLED_APPS = [
