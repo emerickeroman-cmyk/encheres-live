@@ -1,18 +1,18 @@
 from django.contrib import admin
-from django.urls import path, include
-from django.views.generic import RedirectView
+from django.urls import path, include, re_path
+from django.views.generic import TemplateView
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    # Redirige http://127.0.0.1:8000/ directement vers l'API
-    path('', RedirectView.as_view(url='/api/', permanent=False)),
-
     # Panneau d'administration
     path('admin/', admin.site.urls),
 
     # Inclusion des URLs de votre application encheres sous le préfixe /api/
     path('api/', include('encheres.urls')),
+
+    # Redirige toutes les autres requêtes vers l'application React
+    re_path(r'^.*$', TemplateView.as_view(template_name='index.html')),
 ]
 
 # PERMET À DJANGO DE SERVIR LES IMAGES STOCKÉES DANS LE DOSSIER MEDIA

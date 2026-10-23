@@ -36,6 +36,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Support des fichiers statiques & React en prod
     'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -47,10 +48,11 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'core.urls'
 
+# --- DIRS TEMPLATES (Inclut le build React) ---
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR.parent / 'frontend' / 'build'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -67,8 +69,6 @@ WSGI_APPLICATION = 'core.wsgi.application'
 ASGI_APPLICATION = 'core.asgi.application'
 
 # --- BASE DE DONNÉES ---
-# Par défaut : SQLite (développement rapide).
-# Pour utiliser MySQL ou PostgreSQL, renseignez les variables du fichier .env
 DB_ENGINE = os.getenv('DB_ENGINE', 'sqlite')
 
 if DB_ENGINE == 'postgresql':
@@ -117,8 +117,16 @@ USE_I18N = True
 USE_TZ = True
 
 # --- FICHIERS STATIQUES & MEDIA ---
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# WhiteNoise / React Integration
+STATICFILES_DIRS = [
+    BASE_DIR.parent / 'frontend' / 'build',
+]
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
@@ -150,8 +158,8 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
-# --- CORS (autorise le frontend React en développement) ---
+# --- CORS ---
 CORS_ALLOWED_ORIGINS = os.getenv(
-    'CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000'
+    'CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173'
 ).split(',')
 CORS_ALLOW_CREDENTIALS = True
