@@ -8,10 +8,12 @@ body {
   background-color: #f8f9fc;
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
   overflow-x: hidden;
+  margin: 0;
+  padding: 0;
 }
 
 /* ------------------------------------------------------------------
-   STYLES DU SIDEBAR VERTICAL (GAUCHE)
+   STYLES DU SIDEBAR VERTICAL (GAUCHE) & RESPONSIVE MOBILE
    ------------------------------------------------------------------ */
 .sidebar-vertical {
   width: 260px;
@@ -22,6 +24,7 @@ body {
   background: var(--degrade-sidebar);
   box-shadow: 4px 0 15px rgba(0, 0, 0, 0.15);
   z-index: 1000;
+  transition: all 0.3s ease;
 }
 
 .sidebar-vertical .nav-link {
@@ -127,4 +130,43 @@ body {
 
 .filter-card {
   border-radius: 1rem;
+}
+
+/* ------------------------------------------------------------------
+   CORRECTIFS TABLEAU DE BORD (Évite les débordements de cartes)
+   ------------------------------------------------------------------ */
+.card, .dashboard-card {
+  height: auto !important;
+  min-height: auto;
+  overflow: visible !important;
+}
+
+/* Légende du graphique de répartition par catégorie */
+.chart-legend, .repartition-legende, ul.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  justify-content: center;
+  margin-top: 20px;
+  padding: 0;
+  list-style: none;
+}
+
+/* ------------------------------------------------------------------
+   MEDIA QUERIES (RESPONSIVE MOBILE)
+   ------------------------------------------------------------------ */
+@media (max-width: 991.98px) {
+  /* Passage de la sidebar en mode haut/horizontal ou masquée pour petits écrans */
+  .sidebar-vertical {
+    width: 100% !important;
+    min-width: 100% !important;
+    height: auto !important;
+    position: relative !important;
+  }
+  
+  /* Ajustement de la mise en page globale pour les tablettes et mobiles */
+  .main-content, .container-fluid {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
 }
