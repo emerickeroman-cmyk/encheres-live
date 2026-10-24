@@ -69,12 +69,11 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core.wsgi.application'
 ASGI_APPLICATION = 'core.asgi.application'
 
-# --- BASE DE DONNÉES (Gérée automatiquement via DATABASE_URL ou SQLite en local) ---
+# --- BASE DE DONNÉES ---
 DATABASES = {
     'default': dj_database_url.config(
         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
         conn_max_age=600,
-        conn_health_checks_enabled=True,
     )
 }
 
