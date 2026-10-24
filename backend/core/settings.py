@@ -36,8 +36,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # Placé en amont pour intercepter et autoriser les requêtes API correctement
     'whitenoise.middleware.WhiteNoiseMiddleware',  # Support des fichiers statiques & React en prod
-    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -160,7 +160,9 @@ SIMPLE_JWT = {
 }
 
 # --- CORS ---
+# Ajout explicite du domaine de production Render dans les origines autorisées
 CORS_ALLOWED_ORIGINS = os.getenv(
-    'CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173'
+    'CORS_ALLOWED_ORIGINS', 
+    'https://encheres-live.onrender.com,http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173'
 ).split(',')
 CORS_ALLOW_CREDENTIALS = True
