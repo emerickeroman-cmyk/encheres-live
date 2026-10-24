@@ -5,6 +5,7 @@ from django.utils import timezone
 
 class Categorie(models.Model):
     nom = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True, null=True)  # <-- Ajouté ici pour corriger l'erreur de base de données
     icone = models.CharField(max_length=50, blank=True, default='gavel')
     couleur = models.CharField(max_length=20, default='#3B82F6')
     date_creation = models.DateTimeField(auto_now_add=True)
