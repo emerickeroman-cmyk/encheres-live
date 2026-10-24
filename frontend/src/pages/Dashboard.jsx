@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
-  PieChart, Pie, Cell, Legend, BarChart, Bar,
+  PieChart, Pie, Cell, BarChart, Bar,
 } from 'recharts';
 import api from '../api/axios';
 import Loader from '../components/Loader';
@@ -49,32 +49,18 @@ export default function Dashboard() {
     jour: new Date(d.date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }),
   }));
 
-  // Calcul du total des articles présents dans la répartition par catégorie
   const totalArticlesCategories = donnees.repartition_categories.reduce((acc, curr) => acc + (curr.nb || 0), 0);
 
-  // Fonction pour afficher le pourcentage directement sur chaque tranche de couleur
-  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, nb }) => {
-    // Évite d'afficher si le pourcentage est nul ou insignifiant
+  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
     if (!percent || percent < 0.03) return null;
-
     const RADIAN = Math.PI / 180;
-    // Positionnement du texte au milieu de l'anneau de la tranche
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
     const pourcentageReel = Math.round(percent * 100);
 
     return (
-      <text
-        x={x}
-        y={y}
-        fill="#ffffff"
-        textAnchor="middle"
-        dominantBaseline="central"
-        fontSize={12}
-        fontWeight="bold"
-      >
+      <text x={x} y={y} fill="#ffffff" textAnchor="middle" dominantBaseline="central" fontSize={12} fontWeight="bold">
         {`${pourcentageReel}%`}
       </text>
     );
@@ -94,7 +80,7 @@ export default function Dashboard() {
         <CarteIndicateur icone="bi-graph-up-arrow" titre="Taux de conversion" valeur={donnees.taux_conversion} suffixe="%" couleurDe="#ec4899" couleurA="#db2777" />
       </div>
 
-      {/* Graphique évolution + Camembert avec pourcentages */}
+      {/* Graphique évolution + Camembert */}
       <div className="row g-4 mb-4">
         <div className="col-lg-7">
           <div className="card border-0 shadow-sm h-100">
@@ -114,34 +100,54 @@ export default function Dashboard() {
         </div>
 
         <div className="col-lg-5">
-          <div className="card border-0 shadow-sm h-100">
-            <div className="card-body">
+          <div className="card border-0 shadow-sm h-100 d-flex flex-column">
+            <div className="card-body d-flex flex-column">
               <h6 className="fw-bold mb-3"><i className="bi bi-pie-chart-fill me-2"></i>Répartition par catégorie</h6>
-              <ResponsiveContainer width="100%" height={280}>
-                <PieChart>
-                  <Pie
-                    data={donnees.repartition_categories}
-                    dataKey="nb"
-                    nameKey="nom"
-                    cx="50%"
-                    cy="45%"
-                    innerRadius={45}
-                    outerRadius={85}
-                    paddingAngle={2}
-                    labelLine={false}
-                    label={renderCustomizedLabel}
-                  >
-                    {donnees.repartition_categories.map((entry, index) => (
-                      <Cell key={index} fill={entry.couleur || COULEURS_DEFAUT[index % COULEURS_DEFAUT.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value, name) => [
-                    `${value} article(s) (${totalArticlesCategories ? Math.round((value / totalArticlesCategories) * 100) : 0}%)`,
-                    name
-                  ]} />
-                  <Legend verticalAlign="bottom" height={36} iconType="circle" />
-                </PieChart>
-              </ResponsiveContainer>
+              
+              {/* Conteneur du camembert */}
+              <div style={{ width: '100%', height: '210px' }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={donnees.repartition_categories}
+                      dataKey="nb"
+                      nameKey="nom"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={40}
+                      outerRadius={75}
+                      paddingAngle={2}
+                      labelLine={false}
+                      label={renderCustomizedLabel}
+                    >
+                      {donnees.repartition_categories.map((entry, index) => (
+                        <Cell key={index} fill={entry.couleur || COULEURS_DEFAUT[index % COULEURS_DEFAUT.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value, name) => [
+                      `${value} article(s) (${totalArticlesCategories ? Math.round((value / totalArticlesCategories) * 100) : 0}%)`,
+                      name
+                    ]} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Légende HTML propre intégrée à l'intérieur de la carte */}
+              <div className="mt-auto pt-3 d-flex flex-wrap justify-content-center gap-2">
+                {donnees.repartition_categories.map((entry, index) => {
+                  const couleurItem = entry.couleur || COULEURS_DEFAUT[index % COULEURS_DEFAUT.length];
+                  return (
+                    <div key={index} className="d-flex align-items-center me-2 mb-1" style={{ fontSize: '0.8rem' }}>
+                      <span
+                        className="rounded-circle me-1 d-inline-block"
+                        style={{ width: '10px', height: '10px', backgroundColor: couleurItem }}
+                      ></span>
+                      <span className="text-muted fw-medium">{entry.nom}</span>
+                    </div>
+                  );
+                })}
+              </div>
+
             </div>
           </div>
         </div>
