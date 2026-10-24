@@ -11,8 +11,8 @@ urlpatterns = [
     # Inclusion des URLs de votre application encheres sous le préfixe /api/
     path('api/', include('encheres.urls')),
 
-    # Redirige toutes les autres requêtes vers l'application React
-    re_path(r'^.*$', TemplateView.as_view(template_name='index.html')),
+    # Redirige toutes les autres requêtes vers l'application React (sauf static, media, admin et api)
+    re_path(r'^(?!static/|media/|admin/|api/).*$', TemplateView.as_view(template_name='index.html')),
 ]
 
 # PERMET À DJANGO DE SERVIR LES IMAGES STOCKÉES DANS LE DOSSIER MEDIA
