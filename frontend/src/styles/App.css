@@ -139,17 +139,19 @@ body {
   height: auto !important;
   min-height: auto;
   overflow: visible !important;
+  /* Ajout d'un espacement intérieur bas pour que les légendes respirent et restent dedans */
+  padding-bottom: 1.75rem !important; 
 }
 
 /* Légende du graphique de répartition par catégorie */
-.chart-legend, .repartition-legende, ul.legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 16px;
-  justify-content: center;
-  margin-top: 20px;
-  padding: 0;
-  list-style: none;
+.chart-legend, .repartition-legende, ul.legend, .recharts-default-legend {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px 16px !important;
+  justify-content: center !important;
+  margin-top: 25px !important;
+  padding: 0 10px !important;
+  list-style: none !important;
 }
 
 /* ------------------------------------------------------------------
