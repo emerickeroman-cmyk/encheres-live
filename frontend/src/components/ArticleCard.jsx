@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const API_URL = 'http://127.0.0.1:8000';
+const API_URL = process.env.REACT_APP_API_URL || '';
 
 const BADGES_STATUT = {
   EN_ATTENTE: { classe: 'bg-secondary', label: 'En attente', icone: 'bi-hourglass-split' },
