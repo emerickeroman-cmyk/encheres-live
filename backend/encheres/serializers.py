@@ -33,8 +33,13 @@ class InscriptionSerializer(serializers.ModelSerializer):
         return value.lower()
 
     def validate_username(self, value):
-        if len(value) < 3:
-            raise serializers.ValidationError("Le nom d'utilisateur doit contenir au moins 3 caractères.")
+        # Vérification du format : doit commencer par 'acheteur' ou 'vendeur' suivi d'un identifiant
+        pattern = r'^(acheteur|vendeur)[a-zA-Z0-9_-]+$'
+        if not re.match(pattern, value, re.IGNORECASE):
+            raise serializers.ValidationError(
+                "Le nom d'utilisateur doit obligatoirement commencer par 'acheteur' ou 'vendeur' suivi d'un identifiant (ex: acheteur1, vendeur_kyle)."
+            )
+        # Vérification des doublons
         if User.objects.filter(username__iexact=value).exists():
             raise serializers.ValidationError("Ce nom d'utilisateur est déjà pris.")
         return value
@@ -61,7 +66,7 @@ class CategorieSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Categorie
-        fields = ['id', 'nom', 'description', 'icone', 'couleur', 'nombre_articles', 'date_creation']
+        fields = ['id', 'nom', 'icone', 'couleur', 'nombre_articles', 'date_creation']
 
     def get_nombre_articles(self, obj):
         return getattr(obj, 'nb', obj.articles.count())
@@ -80,7 +85,6 @@ class EnchereSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Enchere
-        # Ajout du champ 'statut' afin qu'il soit transmis à React
         fields = ['id', 'article', 'encherisseur', 'encherisseur_nom', 'montant', 'statut', 'date_enchere']
         read_only_fields = ['id', 'encherisseur', 'date_enchere']
 
@@ -192,7 +196,7 @@ class ArticleEnchereDetailSerializer(serializers.ModelSerializer):
 
     def validate_prix_depart(self, value):
         if value <= 0:
-            raise serializers.ValidationError("Le prix de départ doit être strictly supérieur à zéro.")
+            raise serializers.ValidationError("Le prix de départ doit être strictement supérieur à zéro.")
         return value
 
     def validate(self, attrs):

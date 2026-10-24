@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { useAuth } from '../context/AuthContext';
 
 const REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const REGEX_USERNAME = /^(acheteur|vendeur)[a-zA-Z0-9_-]+$/i;
 
 export default function Register() {
   const { inscrire } = useAuth();
@@ -18,7 +19,9 @@ export default function Register() {
 
   const valider = () => {
     const e = {};
-    if (form.username.trim().length < 3) e.username = "Minimum 3 caractères.";
+    if (!REGEX_USERNAME.test(form.username.trim())) {
+      e.username = "Le nom d'utilisateur doit commencer par 'acheteur' ou 'vendeur' (ex: acheteur1, vendeur_eric).";
+    }
     if (!REGEX_EMAIL.test(form.email)) e.email = 'Adresse email invalide.';
     if (form.password.length < 8) e.password = 'Minimum 8 caractères.';
     if (form.password !== form.password2) e.password2 = 'Les mots de passe ne correspondent pas.';
@@ -73,15 +76,19 @@ export default function Register() {
               <div className="col-md-6">
                 <label className="form-label">Nom d'utilisateur *</label>
                 <input
+                  type="text"
                   className={`form-control ${erreurs.username ? 'is-invalid' : ''}`}
+                  placeholder="ex: acheteur1, vendeur_eric"
                   value={form.username} onChange={champ('username')} required
                 />
+                <small className="text-muted d-mt-1">Doit commencer par acheteur ou vendeur.</small>
                 {erreurs.username && <div className="invalid-feedback">{erreurs.username}</div>}
               </div>
               <div className="col-md-6">
                 <label className="form-label">Email *</label>
                 <input
                   type="email" className={`form-control ${erreurs.email ? 'is-invalid' : ''}`}
+                  placeholder="ex: mon@email.com"
                   value={form.email} onChange={champ('email')} required
                 />
                 {erreurs.email && <div className="invalid-feedback">{erreurs.email}</div>}

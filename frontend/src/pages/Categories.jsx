@@ -9,7 +9,7 @@ const COULEURS = ['#6366f1', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#eab30
 export default function Categories() {
   const [categories, setCategories] = useState([]);
   const [chargement, setChargement] = useState(true);
-  const [form, setForm] = useState({ nom: '', description: '', icone: ICONES[0], couleur: COULEURS[0] });
+  const [form, setForm] = useState({ nom: '', icone: ICONES[0], couleur: COULEURS[0] });
   const [erreurs, setErreurs] = useState({});
   const [envoi, setEnvoi] = useState(false);
 
@@ -31,7 +31,7 @@ export default function Categories() {
     try {
       await api.post('/categories/', form);
       toast.success('Catégorie créée avec succès.');
-      setForm({ nom: '', description: '', icone: ICONES[0], couleur: COULEURS[0] });
+      setForm({ nom: '', icone: ICONES[0], couleur: COULEURS[0] });
       charger();
     } catch (err) {
       setErreurs(err.response?.data || {});
@@ -69,13 +69,6 @@ export default function Categories() {
                     value={form.nom} onChange={(e) => setForm({ ...form, nom: e.target.value })}
                   />
                   {erreurs.nom && <div className="invalid-feedback">{erreurs.nom}</div>}
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">Description</label>
-                  <textarea
-                    className="form-control" rows="2" value={form.description}
-                    onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  />
                 </div>
                 <div className="row g-2 mb-3">
                   <div className="col-6">

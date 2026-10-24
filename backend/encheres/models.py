@@ -5,10 +5,9 @@ from django.utils import timezone
 
 class Categorie(models.Model):
     nom = models.CharField(max_length=100, unique=True)
-    description = models.TextField(blank=True, default='')
     icone = models.CharField(max_length=50, blank=True, default='gavel')
     couleur = models.CharField(max_length=20, default='#3B82F6')
-    date_creation = models.DateTimeField(auto_now_add=True)  # Correction appliquée ici
+    date_creation = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name = "Catégorie"
@@ -115,7 +114,7 @@ class Enchere(models.Model):
         ordering = ['-montant', '-date_enchere']
 
     def __str__(self):
-        return f"{self.encherisseur.username} - {self.montant}€ sur {self.article.titre}"
+        return f"{self.encherisseur.username} {self.montant} Ar sur {self.article.titre}"
 
 
 class Favori(models.Model):
