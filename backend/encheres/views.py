@@ -20,22 +20,21 @@ from .permissions import EstProprietaireOuLectureSeule
 # ------------------------------------------------------------------
 # AUTHENTIFICATION
 # ------------------------------------------------------------------
-class InscriptionView(generics.CreateAPIView):
+class InscriptionView(APIView):
     """POST /api/auth/inscription/ — création d'un compte utilisateur."""
-    queryset = User.objects.all()
-    serializer_class = InscriptionSerializer
     permission_classes = [permissions.AllowAny]
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        refresh = RefreshToken.for_user(user)
-        return Response({
-            'user': UtilisateurSerializer(user).data,
-            'access': str(refresh.access_token),
-            'refresh': str(refresh),
-        }, status=status.HTTP_201_CREATED)
+    def post(self, request):
+        serializer = InscriptionSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'user': UtilisateurSerializer(user).data,
+                'access': str(refresh.access_token),
+                'refresh': str(refresh),
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ConnexionView(TokenObtainPairView):
