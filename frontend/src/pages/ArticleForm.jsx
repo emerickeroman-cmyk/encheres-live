@@ -111,11 +111,22 @@ export default function ArticleForm() {
       }
       navigate('/mes-articles');
     } catch (err) {
+      console.error("Erreur complète:", err);
       const data = err.response?.data;
-      if (data && typeof data === 'object') setErreurs(data);
-      toast.error("Veuillez vérifier les informations saisies.");
-    } finally {
-      setEnvoi(false);
+      if (data && typeof data === 'object') {
+        setErreurs(data);
+        // Afficher un message plus précis si disponible
+        const premierMessage = Object.values(data)[0];
+        if (Array.isArray(premierMessage)) {
+          toast.error(premierMessage[0]);
+        } else if (typeof premierMessage === 'string') {
+          toast.error(premierMessage);
+        } else {
+          toast.error("Veuillez vérifier les informations saisies.");
+        }
+      } else {
+        toast.error("Erreur serveur, veuillez réessayer.");
+      }
     }
   };
 
