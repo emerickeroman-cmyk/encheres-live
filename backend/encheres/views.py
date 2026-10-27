@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.db.models import Count, Max, Q
 from django.utils import timezone
-from rest_framework import viewsets, generics, permissions, status, filters
+from rest_framework import viewsets, permissions, status, filters
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -138,7 +138,7 @@ class ArticleEnchereViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
     def mes_articles(self, request):
-        """GET /api/articles/mes_articles/ — articles publiés par l'utilisateur connecté, triés du plus récent au plus ancien."""
+        """GET /api/articles/mes_articles/ — articles publiés par l'utilisateur connecté."""
         qs = self.get_queryset().filter(vendeur=request.user).order_by('-date_creation')
         page = self.paginate_queryset(qs)
         if page is not None:
@@ -165,7 +165,7 @@ class ArticleEnchereViewSet(viewsets.ModelViewSet):
 
 
 # ------------------------------------------------------------------
-# ENCHÈRES (GESTION / VALIDATION / ANNULATION)
+# ENCHÈRES
 # ------------------------------------------------------------------
 class EnchereViewSet(viewsets.ModelViewSet):
     queryset = Enchere.objects.select_related('article', 'encherisseur').all()
@@ -182,7 +182,6 @@ class EnchereViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def valider(self, request, pk=None):
-        """POST /api/encheres/{id}/valider/ — valider une offre et marquer l'article comme terminé."""
         enchere = self.get_object()
         if enchere.article.vendeur != request.user:
             return Response({'detail': 'Seul le vendeur peut valider cette offre.'}, status=status.HTTP_403_FORBIDDEN)
@@ -190,7 +189,6 @@ class EnchereViewSet(viewsets.ModelViewSet):
         enchere.statut = Enchere.StatutEnchere.VALIDEE
         enchere.save(update_fields=['statut'])
 
-        # Marque également l'article comme terminé
         article = enchere.article
         article.statut = ArticleEnchere.Statut.TERMINEE
         article.save(update_fields=['statut'])
@@ -199,7 +197,6 @@ class EnchereViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def refuser(self, request, pk=None):
-        """POST /api/encheres/{id}/refuser/ — refuser/annuler une offre."""
         enchere = self.get_object()
         if enchere.article.vendeur != request.user:
             return Response({'detail': 'Seul le vendeur peut refuser cette offre.'}, status=status.HTTP_403_FORBIDDEN)
@@ -222,16 +219,14 @@ class FavoriViewSet(viewsets.ModelViewSet):
 
 
 # ------------------------------------------------------------------
-# TABLEAU DE BORD / STATISTIQUES
+# TABLEAU DE BORD
 # ------------------------------------------------------------------
 class TableauDeBordView(APIView):
-    """GET /api/dashboard/ — indicateurs agrégés filtrés par vendeur (ou globaux si admin)."""
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
         user = request.user
 
-        # Filtrage selon le rôle : l'admin voit tout, le vendeur ne voit que ses articles/offres
         if user.is_staff:
             articles = ArticleEnchere.objects.all()
             encheres = Enchere.objects.all()
@@ -250,7 +245,6 @@ class TableauDeBordView(APIView):
         taux_conversion = round((articles_avec_offres / total_articles) * 100, 1) if total_articles else 0
         taux_actives = round((actives / total_articles) * 100, 1) if total_articles else 0
 
-        # Répartition des catégories filtrée sur les articles concernés
         repartition_categories = list(
             Categorie.objects.filter(articles__in=articles)
             .annotate(nb=Count('articles', filter=Q(articles__in=articles)))
